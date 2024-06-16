@@ -1,4 +1,5 @@
 let video;
+let canvas;
 let canvasElement;
 let container = document.querySelector('#container');
 let innerSize = [window.innerWidth, window.innerHeight];
@@ -21,11 +22,21 @@ function openCamera() {
     
     div = document.createElement('div');
     div.style.width = `${innerSize[0]}px`;
+    div.style.height = `${innerSize[1]*0.88 - innerSize[1]*0.3}px`;
+    div.style.top = `${innerSize[1]*0.12}px`;
+    div.id = 'more';
+    container.appendChild(div);
+
+    div = document.createElement('div');
+    div.style.width = `${innerSize[0]}px`;
     div.style.height = `${innerSize[1]*0.3}px`;
+    div.style.backgroundColor = 'black';
+    div.style.color = 'white';
     
     let div2 = document.createElement('div');
     div2.style.display = 'flex';
     div2.style.justifyContent = 'center';
+    div2.id = 'types';
 
     let cameraType = document.createElement('div');
     cameraType.style.fontSize = '2vh';
@@ -35,7 +46,6 @@ function openCamera() {
     cameraType.style.margin = '1vh';
     cameraType.style.borderRadius = '90px';
     cameraType.textContent = '사진';
-
     div2.appendChild(cameraType);
     
     cameraType = cameraType.cloneNode(cameraType);
@@ -64,13 +74,22 @@ function openCamera() {
             // canvasElement.height = innerSize[1]*0.48;
             canvasElement.width = video.videoWidth;
             canvasElement.height = video.videoHeight;
+            if(video.videoWidth>video.videoHeight){
+            //     canvasElement.width = innerSize[0];
+            //     canvasElement.height = innerSize[0]/video.videoWidth*video.videoHeight;
+            // }else{
+                let height = Number(document.getElementById('more').style.height.replace('px',''));
+                canvasElement.width = height/video.videoHeight*video.videoWidth;
+                canvasElement.height = height;
+            }
             canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
         }
         requestAnimationFrame(tick);
     }
 }
 function selectType(x=0) {
-    let types = document.querySelectorAll('#container > div > div:nth-child(1) > *')
+    // let types = document.querySelectorAll('#container > div > div:nth-child(1) > *')
+    types = Array.from(document.getElementById('types').children);
     let typesWidth = [0, 0];
     types.forEach((e, i)=>{
         e.onclick = () => selectType(i);
@@ -78,19 +97,33 @@ function selectType(x=0) {
         e.style.backgroundColor = 'unset';
         if(x<i){
             typesWidth[0] += e.getBoundingClientRect().width;
-            typesWidth[0] += innerSize[1]*0.03;//cameraType.style.margin
+            typesWidth[0] += innerSize[1]*0.02;//cameraType.style.margin
         }else if(x>i){
             typesWidth[1] += e.getBoundingClientRect().width;
-            typesWidth[1] += innerSize[1]*0.03;//cameraType.style.margin
+            typesWidth[1] += innerSize[1]*0.02;//cameraType.style.margin
         }else{
             e.style.fontWeight = 'bold';
-            e.style.backgroundColor = 'lightgray';
+            e.style.backgroundColor = 'rgba(255,255,255,0.2)';
         }
     });
     let y = typesWidth[1]-typesWidth[0];
     y /= 2;
-    div = document.querySelector('#container > div > div:nth-child(1)');
+    div = document.getElementById('types');
     div.style.transform = `translateX(${-y}px)`;
+    canvasElement.style.filter = 'unset';
+    document.getElementById('more').style.display = 'none';
+    switch(x){
+        case 0:
+            break;
+        case 1:
+            break;
+        case 2:
+            canvasElement.style.filter = 'blur(50px)';
+            document.getElementById('more').style.display = 'block';
+            break;
+        default:
+            break;
+    }
 }
 function closeCamera(stream = video.srcObject) {
     if (stream) {
