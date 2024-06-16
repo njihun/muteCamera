@@ -1,7 +1,7 @@
 body {
     margin: 0;
     user-select: none;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 #logo {
     width: 100%;
@@ -18,6 +18,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden; /* 컨테이너 오버플로우 숨기기 */
+    position: relative; /* 상대적인 위치 설정 */
 }
 #container > .button {
     width: 18vh;
