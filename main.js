@@ -75,9 +75,9 @@ function openCamera() {
             canvasElement.width = video.videoWidth;
             canvasElement.height = video.videoHeight;
             if(video.videoWidth>video.videoHeight){
-            //     canvasElement.width = innerSize[0];
-            //     canvasElement.height = innerSize[0]/video.videoWidth*video.videoHeight;
-            // }else{
+                canvasElement.width = innerSize[0];
+                canvasElement.height = innerSize[0]/video.videoWidth*video.videoHeight;
+            }else{
                 let height = Number(document.getElementById('more').style.height.replace('px',''));
                 canvasElement.width = height/video.videoHeight*video.videoWidth;
                 canvasElement.height = height;
