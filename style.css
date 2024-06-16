@@ -1,6 +1,7 @@
 body {
     margin: 0;
     user-select: none;
+    overflow: hidden;
 }
 #logo {
     width: 100%;
@@ -35,4 +36,7 @@ body {
 #container > #more {
     position: absolute;
     background-color: rgba(0, 0, 0, 0.5);
+}
+#types {
+    transition: transform 0.2s ease;
 }
