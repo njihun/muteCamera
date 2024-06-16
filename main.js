@@ -32,7 +32,7 @@ function openCamera() {
     cameraType.style.padding = '1.2vh';
     cameraType.style.paddingLeft = '2.5vh';
     cameraType.style.paddingRight = '2.5vh';
-    cameraType.style.margin = '1.5vh';
+    cameraType.style.margin = '1vh';
     cameraType.style.borderRadius = '90px';
     cameraType.textContent = '사진';
 
