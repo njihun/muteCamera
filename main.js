@@ -2,137 +2,144 @@ let video;
 let canvasElement;
 let container = document.querySelector('#container');
 let innerSize = [innerWidth, innerHeight];
-document.addEventListener('fullscreenchange', ()=>{
+document.addEventListener('fullscreenchange', () => {
     innerSize = [innerWidth, innerHeight];
 });
 function openCamera() {
-    fullscreen().then(() => {
-        if (!isFullscreen) {
-            alert("전체 화면이 지원되지 않는 환경입니다. 브라우저에 따라 화면 비율이 다르게 표시될 수 있습니다.");
-        }
-        // exitFullScreen();
-        canvasElement = document.createElement('canvas');
-        let canvas = canvasElement.getContext('2d');
-        container.innerHTML = '';
-        container.style.display = 'flex';
-        container.style.flexDirection = 'column';
-        
-        innerSize = [innerWidth, innerHeight];
-        
-        let div = document.createElement('div');
-        div.style.width = `${innerSize[0]}px`;
-        div.style.height = `${innerSize[1] * 0.88 - innerSize[1] * 0.3}px`;
-        div.style.display = 'flex';
-        div.style.alignItems = 'center';
-        div.style.justifyContent = 'center';
-        div.appendChild(canvasElement);
-        container.appendChild(div);
+    // if (!isFullscreen) {
+    //     alert("전체 화면이 지원되지 않는 환경입니다. 브라우저에 따라 화면 비율이 다르게 표시될 수 있습니다.");
+    // }
+    canvasElement = document.createElement('canvas');
+    let canvas = canvasElement.getContext('2d');
+    container.innerHTML = '';
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
 
-        div = document.createElement('div');
-        div.style.width = `${innerSize[0]}px`;
-        div.style.height = `${innerSize[1] * 0.88 - innerSize[1] * 0.3}px`;
-        div.style.top = `${innerSize[1] * 0.12}px`;
-        div.id = 'more';
-        container.appendChild(div);
+    let div = document.createElement('div');
+    div.style.width = '100vw';
+    div.style.height = 'calc(88vh - 30vh)';
+    div.style.display = 'flex';
+    div.style.alignItems = 'center';
+    div.style.justifyContent = 'center';
+    div.appendChild(canvasElement);
+    container.appendChild(div);
 
-        div = document.createElement('div');
-        div.style.width = `${innerSize[0]}px`;
-        div.style.height = `${innerSize[1] * 0.3}px`;
-        div.style.backgroundColor = 'black';
-        div.style.color = 'white';
-        div.style.zIndex = '1';//canvas blur 번짐 방지
-        div.style.display = 'flex';
-        div.style.flexDirection = 'column';
+    div = document.createElement('div');
+    div.style.width = '100vw';
+    div.style.height = '58vh';//calc(88vh - 30vh)
+    div.style.top = '12vh';
+    div.id = 'more';
+    container.appendChild(div);
 
-        let div2 = document.createElement('div');
-        div2.style.display = 'flex';
-        div2.style.justifyContent = 'center';
-        div2.id = 'types';
+    div = document.createElement('div');
+    div.style.width = '100vw';
+    div.style.height = '30vh';
+    div.style.backgroundColor = 'black';
+    div.style.color = 'white';
+    div.style.zIndex = '1';//canvas blur 번짐 방지
+    div.style.display = 'flex';
+    div.style.flexDirection = 'column';
 
-        let cameraType = document.createElement('div');
-        cameraType.style.fontSize = '2vh';
-        cameraType.style.padding = '1.2vh';
-        cameraType.style.paddingLeft = '2.5vh';
-        cameraType.style.paddingRight = '2.5vh';
-        cameraType.style.margin = '1vh';
-        cameraType.style.borderRadius = '90px';
-        cameraType.textContent = '사진';
-        div2.appendChild(cameraType);
+    let div2 = document.createElement('div');
+    div2.style.display = 'flex';
+    div2.style.justifyContent = 'center';
+    div2.id = 'types';
 
-        cameraType = cameraType.cloneNode();
-        cameraType.textContent = '동영상';
-        div2.appendChild(cameraType);
+    let cameraType = document.createElement('div');
+    cameraType.style.fontSize = '2vh';
+    cameraType.style.padding = '1.2vh';
+    cameraType.style.paddingLeft = '2.5vh';
+    cameraType.style.paddingRight = '2.5vh';
+    cameraType.style.margin = '1vh';
+    cameraType.style.borderRadius = '90px';
+    cameraType.textContent = '사진';
+    div2.appendChild(cameraType);
 
-        cameraType = cameraType.cloneNode();
-        cameraType.textContent = '더보기';
-        div2.appendChild(cameraType);
+    cameraType = cameraType.cloneNode();
+    cameraType.textContent = '동영상';
+    div2.appendChild(cameraType);
 
-        div.appendChild(div2);
+    cameraType = cameraType.cloneNode();
+    cameraType.textContent = '더보기';
+    div2.appendChild(cameraType);
 
-        div2 = document.createElement('div');
-        div2.style.display = 'flex';
-        div2.style.alignItems = 'center';
-        div2.style.justifyContent = 'center';
-        div2.style.width = `${innerSize[0]}px`;
-        div2.style.flexGrow = '1';
-        
-        div3 = document.createElement('div');
-        div3.style.width = `${innerSize[1] * 0.1}px`;
-        div3.style.height = `${innerSize[1] * 0.1}px`;
-        div3.style.backgroundColor = 'white';
-        div3.style.borderRadius = '50%';
-        div3.style.margin = '0 auto';
-        div2.appendChild(div3);
+    div.appendChild(div2);
 
-        div3 = div3.cloneNode();
-        div3.style.width = `${innerSize[1] * 0.15}px`;
-        div3.style.height = `${innerSize[1] * 0.15}px`;
-        div2.appendChild(div3);
+    div2 = document.createElement('div');
+    div2.style.display = 'flex';
+    div2.style.alignItems = 'center';
+    div2.style.justifyContent = 'center';
+    div2.style.width = '100vw';
+    div2.style.flexGrow = '1';
+    div2.style.gap = '10vw';
 
-        div3 = div3.cloneNode();
-        div3.style.width = `${innerSize[1] * 0.1}px`;
-        div3.style.height = `${innerSize[1] * 0.1}px`;
-        div2.appendChild(div3);
+    div3 = document.createElement('div');
+    div3.style.width = '8vh';
+    div3.style.height = '8vh';
+    div3.style.backgroundColor = 'white';
+    div3.style.borderRadius = '50%';
+    div2.appendChild(div3);
 
-        div.appendChild(div2);
+    div3 = div3.cloneNode();
+    div3.style.width = '10vh';
+    div3.style.height = '10vh';
+    div2.appendChild(div3);
 
-        container.appendChild(div);
+    div3 = div3.cloneNode();
+    div3.style.width = '8vh';
+    div3.style.height = '8vh';
+    div2.appendChild(div3);
 
-        selectType(0, innerSize);
+    div.appendChild(div2);
 
-        video = document.createElement('video');
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user'/*environment*/ } }).then(function (stream) {
-            video.srcObject = stream;
-            video.setAttribute('playsinline', true);      // iOS 사용시 전체 화면을 사용하지 않음을 전달
-            video.play();
-            requestAnimationFrame(tick);
-        });
-        function tick() {
-            if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                // canvasElement.width = innerSize[0];
-                // canvasElement.height = innerSize[1]*0.48;
-                canvasElement.width = video.videoWidth;
-                canvasElement.height = video.videoHeight;
-                if (video.videoWidth > video.videoHeight) {
-                    let height = Number(document.getElementById('more').style.height.replace('px', ''));
-                    canvasElement.width = height / video.videoHeight * video.videoWidth;
-                    canvasElement.height = height;
-                } else {
-                    canvasElement.width = innerSize[0];
-                    canvasElement.height = innerSize[0] / video.videoWidth * video.videoHeight;
-                }
-                canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
-            }
-            requestAnimationFrame(tick);
-        }
+    container.appendChild(div);
+
+    selectType();
+
+    video = document.createElement('video');
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user'/*environment*/ } }).then(function (stream) {
+        video.srcObject = stream;
+        video.setAttribute('playsinline', true);      // iOS 사용시 전체 화면을 사용하지 않음을 전달
+        video.play();
+        requestAnimationFrame(tick);
     });
+    function tick() {
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+            innerSize = [innerWidth, innerHeight];
+            let height = Number(document.getElementById('more').style.height.replace('vh', ''));
+            if (video.videoWidth > video.videoHeight) {
+                canvasElement.height = video.videoHeight/video.videoWidth*innerSize[0];
+                if(canvasElement.height>height/100*innerSize[1]){
+                    canvasElement.height = height/100*innerSize[1];
+                    //width 미완성
+                    // canvasElement.width = innerSize[0];
+                }else{
+                    canvasElement.width = innerSize[0];
+                }
+            } else {
+                canvasElement.width = video.videoWidth/video.videoHeight*(height/100*innerSize[1]);
+                if(canvasElement.width>innerSize[0]){
+                    canvasElement.width = innerSize[0];
+                    //height 미완성
+                }else{
+                    canvasElement.height = height/100*innerSize[1];
+                }
+            }
+            if(canvasElement.width>innerSize[0]){
+                
+            }else if(canvasElement.height>height/100*innerSize[1]){
+
+            }
+            canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+        }
+        requestAnimationFrame(tick);
+    }
 }
-function selectType(x = 0, innerSize) {
-    
+function selectType(x = 0) {
     types = Array.from(document.getElementById('types').children);
     let typesWidth = [0, 0];
     types.forEach((e, i) => {
-        e.onclick = () => selectType(i, innerSize);
+        e.onclick = () => selectType(i);
         e.style.fontWeight = 'unset';
         e.style.backgroundColor = 'unset';
         if (x < i) {
