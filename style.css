@@ -40,3 +40,8 @@ body {
 #types {
     transition: transform 0.2s ease;
 }
+#gallery {
+    background-size: cover; /* 배경 이미지가 요소를 완전히 덮도록 설정 */
+    background-position: center; /* 배경 이미지를 가운데 정렬 */
+    background-repeat: no-repeat; /* 배경 이미지 반복 없음 */
+}
