@@ -31,6 +31,11 @@ function openCamera() {
     div.style.height = '58vh';//calc(88vh - 30vh)
     div.style.top = '12vh';
     div.id = 'more';
+
+    // let div2 = document.createElement('div');
+    // div2.style.width = '10vh';
+    // div.appendChild(div2);
+
     container.appendChild(div);
 
     div = document.createElement('div');
@@ -42,7 +47,7 @@ function openCamera() {
     div.style.display = 'flex';
     div.style.flexDirection = 'column';
 
-    let div2 = document.createElement('div');
+    div2 = document.createElement('div');
     div2.style.display = 'flex';
     div2.style.justifyContent = 'center';
     div2.id = 'types';
@@ -80,6 +85,54 @@ function openCamera() {
     div3.style.height = '8vh';
     div3.style.backgroundColor = 'white';
     div3.style.borderRadius = '50%';
+    div3.onclick = () => {
+        div = document.createElement('div');
+        div.style.backgroundColor = 'blue';
+        div.style.position = 'fixed';
+        div.style.width = '100vw';
+        div.style.minHeight = '100vh';
+        div.style.top = '0';
+        div.style.zIndex = '1';
+        div.style.display = 'flex';
+        div.style.flexWrap = 'wrap';
+        div.style.top = `${document.getElementById('logo').style.height}px`;
+        div.id = 'galleryTap';
+
+        div2 = document.createElement('div');
+        div2.id = 'logo';
+        div2.textContent = 'Gallery';
+        div2.style.position = 'absolute';
+
+        div3 = document.createElement('div');
+        div3.id = 'back';
+        div3.style.position = 'fixed';
+        div3.style.top = '0';
+        div3.style.width = '10vh';
+        div3.style.height = '10vh';
+        div3.style.lineHeight = '10vh';
+        div3.style.fontSize = '2vh';
+        div3.style.margin = '1vh';
+        div3.style.borderRadius = '50%';
+        div3.style.backgroundColor = 'rgba(255,255,255,0.2)';
+        div3.textContent = 'back';
+        div3.onclick = () => {
+            document.getElementById('galleryTap').remove();
+        }
+        div2.appendChild(div3);
+
+        div.appendChild(div2);
+        
+        gallery.forEach((e, i)=>{
+            div2 = document.createElement('div');
+            div2.id = 'gallery';
+            div2.style.width = '25vw';
+            div2.style.height = '25vw';
+            div2.style.backgroundImage = `url(${e.src})`;
+            div.appendChild(div2);
+        })
+
+        container.appendChild(div);
+    };
     div3.id = 'gallery';
     div2.appendChild(div3);
 
@@ -130,25 +183,35 @@ function openCamera() {
         if (video.readyState === video.HAVE_ENOUGH_DATA) {
             innerSize = [innerWidth, innerHeight];
             let height = Number(document.getElementById('more').style.height.replace('vh', ''));
+            // canvasElement.width = video.videoWidth/video.videoHeight*(height/100*innerSize[1]);
+            // canvasElement.height = video.videoHeight/video.videoWidth*innerSize[0];
+            // if (video.videoWidth > video.videoHeight) {
+            //     if(canvasElement.height>height/100*innerSize[1]){
+            //         canvasElement.height = height/100*innerSize[1];
+            //     }else{
+            //         canvasElement.width = innerSize[0];
+            //     }
+            // } else {
+            //     if(canvasElement.width>innerSize[0]){
+            //         canvasElement.width = innerSize[0];
+            //     }else{
+            //         canvasElement.height = height/100*innerSize[1];
+            //     }
+            // }
             canvasElement.width = video.videoWidth/video.videoHeight*(height/100*innerSize[1]);
             canvasElement.height = video.videoHeight/video.videoWidth*innerSize[0];
             if (video.videoWidth > video.videoHeight) {
                 if(canvasElement.height>height/100*innerSize[1]){
-                    canvasElement.height = height/100*innerSize[1];
-                }else{
                     canvasElement.width = innerSize[0];
+                }else{
+                    canvasElement.height = height/100*innerSize[1];
                 }
             } else {
                 if(canvasElement.width>innerSize[0]){
-                    canvasElement.width = innerSize[0];
-                }else{
                     canvasElement.height = height/100*innerSize[1];
+                }else{
+                    canvasElement.width = innerSize[0];
                 }
-            }
-            if(canvasElement.width>innerSize[0]){
-                
-            }else if(canvasElement.height>height/100*innerSize[1]){
-
             }
             canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
         }
@@ -187,14 +250,12 @@ function selectType(x = 0) {
         case 0:
             document.querySelector("#container > div:nth-child(3) > div:nth-child(2)").style.display = 'flex';
             document.getElementById('shutter').onclick = () => {
-                let img = new Image();
-                img.src = canvasElement.toDataURL('image/png');
-                gallery.unshift(img);
-                document.getElementById('gallery').style.backgroundImage = `url(${img.src})`;
-            };
-            document.getElementById('gallery').onclick = () => {
-                // document.querySelector("#container > div:nth-child(1)").appendChild(imageDownload(gallery[0]));
-
+                if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                    let img = new Image();
+                    img.src = canvasElement.toDataURL('image/png');
+                    gallery.unshift(img);
+                    document.getElementById('gallery').style.backgroundImage = `url(${img.src})`;
+                }
             };
             break;
         case 1:
@@ -222,9 +283,6 @@ function closeCamera(stream = video.srcObject) {
         tracks.forEach(track => track.stop());
         video.srcObject = null; // 스트림을 비워서 비디오 요소도 해제
         container.innerHTML = '';
-        let img = imageDownload(canvasElement);
-        img.classList.add('button')
-        container.appendChild(img);
     }
 }
 /**
