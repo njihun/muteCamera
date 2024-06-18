@@ -12,10 +12,11 @@ function openCamera() {
     //     alert("전체 화면이 지원되지 않는 환경입니다. 브라우저에 따라 화면 비율이 다르게 표시될 수 있습니다.");
     // }
     canvasElement = document.createElement('canvas');
-    let canvas = canvasElement.getContext('2d');
+    canvas = canvasElement.getContext('2d');
     container.innerHTML = '';
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
+    container.style.fontSize = '1.8vh';
 
     let div = document.createElement('div');
     div.style.width = '100vw';
@@ -31,10 +32,6 @@ function openCamera() {
     div.style.height = '58vh';//calc(88vh - 30vh)
     div.style.top = '12vh';
     div.id = 'more';
-
-    // let div2 = document.createElement('div');
-    // div2.style.width = '10vh';
-    // div.appendChild(div2);
 
     container.appendChild(div);
 
@@ -94,14 +91,12 @@ function openCamera() {
         div.style.top = '0';
         div.style.zIndex = '1';
         div.style.display = 'flex';
-        div.style.flexWrap = 'wrap';
-        div.style.top = `${document.getElementById('logo').style.height}px`;
+        div.style.flexDirection = 'column';
         div.id = 'galleryTap';
 
         div2 = document.createElement('div');
         div2.id = 'logo';
         div2.textContent = 'Gallery';
-        div2.style.position = 'absolute';
 
         div3 = document.createElement('div');
         div3.id = 'back';
@@ -122,13 +117,146 @@ function openCamera() {
 
         div.appendChild(div2);
         
+        div2 = document.createElement('div');
+        div2.style.display = 'flex';
+        div2.style.maxHeight = '88vh';//logo height 제외 calc(100vh - 12vh)
+        div2.style.flexWrap = 'wrap';
+        div2.style.overflowY = 'auto';
         gallery.forEach((e, i)=>{
-            div2 = document.createElement('div');
-            div2.id = 'gallery';
-            div2.style.width = '25vw';
-            div2.style.height = '25vw';
-            div2.style.backgroundImage = `url(${e.src})`;
-            div.appendChild(div2);
+
+            div3 = document.createElement('div');
+            div3.id = 'gallery';
+            div3.style.width = '25vw';
+            div3.style.height = '25vw';
+            div3.style.display = 'flex';
+            div3.style.backgroundImage = `url(${e.src})`;
+            div3.onclick = () => {
+                div = document.createElement('div');
+                div.style.position = 'fixed';
+                div.style.top = '0';
+                div.style.backgroundColor = 'black';
+                div.style.width = '100vw';
+                div.style.height = '100vh';
+                div.style.zIndex = '1';
+                div.id = 'detail';
+                
+                div2 = document.createElement('div');
+                div2.id = 'logo';
+                div2.textContent = 'Detail';
+
+                div3 = document.createElement('div');
+                div3.id = 'back';
+                div3.style.position = 'fixed';
+                div3.style.top = '0';
+                div3.style.width = '10vh';
+                div3.style.height = '10vh';
+                div3.style.lineHeight = '10vh';
+                div3.style.fontSize = '2vh';
+                div3.style.margin = '1vh';
+                div3.style.borderRadius = '50%';
+                div3.style.backgroundColor = 'rgba(255,255,255,0.2)';
+                div3.textContent = 'back';
+                div3.onclick = () => {
+                    document.getElementById('detail').remove();
+                }
+                div2.appendChild(div3);
+                div.appendChild(div2);
+
+                div2 = document.createElement('div');
+                div2.style.width = '100vw';
+                div2.style.height = '76vh';//calc(100vh - 12vh - 20vh)
+                div2.style.backgroundImage = `url(${e.src})`;
+                div2.id = 'gallery';
+                div.appendChild(div2);
+                
+                div2 = document.createElement('div');
+                div2.style.width = '100vw';
+                div2.style.height = '12vh';
+                div2.style.lineHeight = '10vh';
+                div2.style.textAlign = 'center';
+                div2.style.display = 'flex';
+                div2.style.alignItems = 'center';
+
+                div3 = document.createElement('div');
+                div3.style.margin = '0 auto';
+                div3.style.width = '10vh';
+                div3.style.height = '10vh';
+                div3.style.backgroundColor = 'rgba(255,255,255,0.2)';
+                div3.style.color = 'white';
+                div3.style.borderRadius = '50%';
+                div3.textContent = 'Download';
+                div3.onclick = () => {
+                    imageDownload(e);
+                }
+                div2.appendChild(div3);
+                
+                div3 = div3.cloneNode(true);
+                div3.textContent = 'trash';
+                div3.onclick = () => {
+                    gallery.splice(i, 1);
+                    document.getElementById('back').click();
+                    document.getElementById('back').click();
+                    try{
+                        document.getElementById('gallery').style.backgroundImage = `url(${gallery[0].src})`;
+                    }catch(err){
+                        document.getElementById('gallery').style.backgroundImage = 'none';
+                    }
+                    document.getElementById('gallery').click();
+                }
+                div2.appendChild(div3);
+
+                div3 = div3.cloneNode(true);
+                div3.textContent = 'detail';
+                div3.onclick = () => {
+                    const img = e;
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.width = img.naturalWidth;
+                    canvas.height = img.naturalHeight;
+                    context.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                    const pixels = imageData.data;
+
+                    const sharpness = calculateSharpness(pixels, canvas.width, canvas.height);
+                    const noise = calculateNoise(pixels);
+                    console.log(`Sharpness: ${sharpness.toFixed(2)}`);
+                    console.log(`Noise Level: ${noise.toFixed(2)}`);
+                    document.querySelectorAll('#detailValue span')[0].textContent = sharpness.toFixed(2);
+                    document.querySelectorAll('#detailValue span')[1].textContent = noise.toFixed(2);
+                    document.getElementById('detailValue').style.display = 'block';
+                }
+                div2.appendChild(div3);
+
+                div.appendChild(div2);
+                
+                
+                div2 = document.createElement('div');
+                div2.style.width = '80vw';
+                div2.style.height = '30vh';
+                div2.style.top = '50%';
+                div2.style.left = '50%';
+                div2.style.position = 'fixed';
+                div2.style.transform = 'translate(-50%, -50%)';
+                div2.style.backgroundColor = 'rgba(0,0,0,0.5)';
+                div2.style.borderRadius = '30px';
+                div2.style.padding = '5vw';
+                div2.style.zIndex = '2';
+                div2.style.color = 'white';
+                div2.style.display = 'none';
+                div2.innerHTML = `
+                <h2>Detail</h2>
+                <div style="user-select: text;">선명도:<span style="margin-left: 1vh;">${0}</span></div>
+                <div style="user-select: text;">노이즈:<span style="margin-left: 1vh;">${0}</span></div>
+                `;
+                div2.id = 'detailValue';
+                div.appendChild(div2);
+                
+                container.appendChild(div);
+            }
+            div2.appendChild(div3);
+            if(i==gallery.length-1)
+                div.appendChild(div2);
         })
 
         container.appendChild(div);
@@ -183,21 +311,6 @@ function openCamera() {
         if (video.readyState === video.HAVE_ENOUGH_DATA) {
             innerSize = [innerWidth, innerHeight];
             let height = Number(document.getElementById('more').style.height.replace('vh', ''));
-            // canvasElement.width = video.videoWidth/video.videoHeight*(height/100*innerSize[1]);
-            // canvasElement.height = video.videoHeight/video.videoWidth*innerSize[0];
-            // if (video.videoWidth > video.videoHeight) {
-            //     if(canvasElement.height>height/100*innerSize[1]){
-            //         canvasElement.height = height/100*innerSize[1];
-            //     }else{
-            //         canvasElement.width = innerSize[0];
-            //     }
-            // } else {
-            //     if(canvasElement.width>innerSize[0]){
-            //         canvasElement.width = innerSize[0];
-            //     }else{
-            //         canvasElement.height = height/100*innerSize[1];
-            //     }
-            // }
             canvasElement.width = video.videoWidth/video.videoHeight*(height/100*innerSize[1]);
             canvasElement.height = video.videoHeight/video.videoWidth*innerSize[0];
             if (video.videoWidth > video.videoHeight) {
@@ -263,10 +376,6 @@ function selectType(x = 0) {
             document.getElementById('shutter').onclick = () => {
                 alert('아직 지원하지 않는 기능입니다.');
                 return;
-                let img = new Image();
-                img.src = canvasElement.toDataURL('image/png');
-                gallery.unshift(img);
-                document.getElementById('gallery').style.backgroundImage = `url(${img.src})`;
             };
             break;
         case 2:
@@ -287,18 +396,49 @@ function closeCamera(stream = video.srcObject) {
 }
 /**
  * 
- * @param {Element} canvas 다운로드할 canvas element
+ * @param {Element} img 다운로드할 이미지
  * @param {String} fileName 다운로드할 사진 파일명 fileName.png
  * @param {String} textContent 다운로드 버튼 텍스트
  * @returns 클릭하면 사진이 다운로드되는 a태그
  */
-function imageDownload(img, fileName = 'image', textContent = 'Download') {
+function imageDownload(img, fileName = 'image') {
     let a = document.createElement('a');
-    a.textContent = textContent;
     a.setAttribute('download', `${fileName}.png`);
     a.setAttribute('href', img.src);
-    return a;
+    a.click();
 }
+
+function calculateSharpness(pixels, width, height) {
+    let sum = 0;
+    for (let y = 0; y < height - 1; y++) {
+        for (let x = 0; x < width - 1; x++) {
+            const index = (y * width + x) * 4;
+            const indexRight = (y * width + (x + 1)) * 4;
+            const indexBottom = ((y + 1) * width + x) * 4;
+
+            const deltaX = Math.abs(pixels[index] - pixels[indexRight]) +
+                           Math.abs(pixels[index + 1] - pixels[indexRight + 1]) +
+                           Math.abs(pixels[index + 2] - pixels[indexRight + 2]);
+
+            const deltaY = Math.abs(pixels[index] - pixels[indexBottom]) +
+                           Math.abs(pixels[index + 1] - pixels[indexBottom + 1]) +
+                           Math.abs(pixels[index + 2] - pixels[indexBottom + 2]);
+
+            sum += deltaX + deltaY;
+        }
+    }
+    return sum / (width * height);
+}
+
+function calculateNoise(pixels) {
+    let sum = 0;
+    for (let i = 0; i < pixels.length; i += 4) {
+        const avg = (pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3;
+        sum += Math.abs(pixels[i] - avg) + Math.abs(pixels[i + 1] - avg) + Math.abs(pixels[i + 2] - avg);
+    }
+    return sum / (pixels.length / 4);
+}
+
 function isFullscreen() {
     return document.fullscreenElement || /* Standard syntax */
         document.webkitFullscreenElement || /* Safari and Opera syntax */
