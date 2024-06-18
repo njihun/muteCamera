@@ -6,6 +6,9 @@ let facingMode = 'user';
 let gallery = [];
 document.addEventListener('fullscreenchange', () => {
     innerSize = [innerWidth, innerHeight];
+    setTimeout(()=>{selectType(Array.from(document.getElementById('types').children).map((e) => {
+        return e.style.backgroundColor;
+    }).indexOf('rgba(255, 255, 255, 0.2)'))}, 100);
 });
 function openCamera() {
     // if (!isFullscreen) {
@@ -85,7 +88,7 @@ function openCamera() {
     div3.style.borderRadius = '50%';
     div3.onclick = () => {
         div = document.createElement('div');
-        div.style.backgroundColor = 'blue';
+        div.style.backgroundColor = 'dimgray';
         div.style.position = 'fixed';
         div.style.width = '100vw';
         div.style.minHeight = '100vh';
@@ -117,13 +120,13 @@ function openCamera() {
         div2.appendChild(div3);
 
         div.appendChild(div2);
-        
+
         div2 = document.createElement('div');
         div2.style.display = 'flex';
         div2.style.maxHeight = '88vh';//logo height 제외 calc(100vh - 12vh)
         div2.style.flexWrap = 'wrap';
         div2.style.overflowY = 'auto';
-        gallery.forEach((e, i)=>{
+        gallery.forEach((e, i) => {
 
             div3 = document.createElement('div');
             div3.id = 'gallery';
@@ -140,7 +143,7 @@ function openCamera() {
                 div.style.height = '100vh';
                 div.style.zIndex = '1';
                 div.id = 'detail';
-                
+
                 div2 = document.createElement('div');
                 div2.id = 'logo';
                 div2.textContent = 'Detail';
@@ -169,7 +172,7 @@ function openCamera() {
                 div2.style.backgroundImage = `url(${e.src})`;
                 div2.id = 'gallery';
                 div.appendChild(div2);
-                
+
                 div2 = document.createElement('div');
                 div2.style.width = '100vw';
                 div2.style.height = '12vh';
@@ -190,17 +193,17 @@ function openCamera() {
                     imageDownload(e);
                 }
                 div2.appendChild(div3);
-                
+
                 div3 = div3.cloneNode(true);
-                div3.textContent = 'trash';
+                div3.textContent = 'delete';
                 div3.onclick = () => {
                     gallery.splice(i, 1);
                     document.getElementById('back').click();
                     document.getElementById('back').click();
-                    try{
-                        document.getElementById('gallery').style.backgroundImage = `url(${gallery[0].src})`;
-                    }catch(err){
-                        document.getElementById('gallery').style.backgroundImage = 'none';
+                    try {
+                        document.querySelectorAll('#gallery')[1].style.backgroundImage = `url(${gallery[0].src})`;
+                    } catch (err) {
+                        document.querySelectorAll('#gallery')[1].style.backgroundImage = 'none';
                     }
                     document.getElementById('gallery').click();
                 }
@@ -212,8 +215,10 @@ function openCamera() {
                     const img = e;
                     const canvas = document.createElement('canvas');
                     const context = canvas.getContext('2d');
-                    canvas.width = img.naturalWidth;
-                    canvas.height = img.naturalHeight;
+                    // canvas.width = img.naturalWidth;
+                    // canvas.height = img.naturalHeight;
+                    canvas.width = img.width;
+                    canvas.height = img.height;
                     context.drawImage(img, 0, 0, canvas.width, canvas.height);
 
                     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
@@ -223,15 +228,16 @@ function openCamera() {
                     const noise = calculateNoise(pixels);
                     console.log(`Sharpness: ${sharpness.toFixed(2)}`);
                     console.log(`Noise Level: ${noise.toFixed(2)}`);
-                    document.querySelectorAll('#detailValue span')[0].textContent = sharpness.toFixed(2);
-                    document.querySelectorAll('#detailValue span')[1].textContent = noise.toFixed(2);
+                    document.querySelectorAll('#detailValue span')[0].textContent = `${canvas.width} x ${canvas.height}`;
+                    document.querySelectorAll('#detailValue span')[1].textContent = sharpness.toFixed(2);
+                    document.querySelectorAll('#detailValue span')[2].textContent = noise.toFixed(2);
                     document.getElementById('detailValue').style.display = 'block';
                 }
                 div2.appendChild(div3);
 
                 div.appendChild(div2);
-                
-                
+
+
                 div2 = document.createElement('div');
                 div2.style.width = '80vw';
                 div2.style.height = '30vh';
@@ -247,16 +253,17 @@ function openCamera() {
                 div2.style.display = 'none';
                 div2.innerHTML = `
                 <h2>Detail</h2>
-                <div style="user-select: text;">선명도:<span style="margin-left: 1vh;">${0}</span></div>
-                <div style="user-select: text;">노이즈:<span style="margin-left: 1vh;">${0}</span></div>
+                <div style="user-select: text;">Resolution:<span style="margin-left: 1vh;">${0}</span></div>
+                <div style="user-select: text;">Sharpness:<span style="margin-left: 1vh;">${0}</span></div>
+                <div style="user-select: text;">Noise Level:<span style="margin-left: 1vh;">${0}</span></div>
                 `;
                 div2.id = 'detailValue';
                 div.appendChild(div2);
-                
+
                 container.appendChild(div);
             }
             div2.appendChild(div3);
-            if(i==gallery.length-1)
+            if (i == gallery.length - 1)
                 div.appendChild(div2);
         })
 
@@ -277,7 +284,7 @@ function openCamera() {
     div3.style.lineHeight = '8vh';
     div3.style.textAlign = 'center';
     div3.style.color = 'black';
-    div3.onclick = () => startVideo(video, facingMode=='user'?'environment':'user');
+    div3.onclick = () => startVideo(video, facingMode == 'user' ? 'environment' : 'user');
     div3.id = 'change';
     div3.textContent = 'change';
     div2.appendChild(div3);
@@ -312,18 +319,18 @@ function openCamera() {
         if (video.readyState === video.HAVE_ENOUGH_DATA) {
             innerSize = [innerWidth, innerHeight];
             let height = Number(document.getElementById('more').style.height.replace('vh', ''));
-            canvasElement.width = video.videoWidth/video.videoHeight*(height/100*innerSize[1]);
-            canvasElement.height = video.videoHeight/video.videoWidth*innerSize[0];
+            canvasElement.width = video.videoWidth / video.videoHeight * (height / 100 * innerSize[1]);
+            canvasElement.height = video.videoHeight / video.videoWidth * innerSize[0];
             if (video.videoWidth > video.videoHeight) {
-                if(canvasElement.height>height/100*innerSize[1]){
+                if (canvasElement.height > height / 100 * innerSize[1]) {
                     canvasElement.width = innerSize[0];
-                }else{
-                    canvasElement.height = height/100*innerSize[1];
+                } else {
+                    canvasElement.height = height / 100 * innerSize[1];
                 }
             } else {
-                if(canvasElement.width>innerSize[0]){
-                    canvasElement.height = height/100*innerSize[1];
-                }else{
+                if (canvasElement.width > innerSize[0]) {
+                    canvasElement.height = height / 100 * innerSize[1];
+                } else {
                     canvasElement.width = innerSize[0];
                 }
             }
@@ -347,7 +354,7 @@ function selectType(x = 0) {
             typesWidth[1] += innerSize[1] * 0.02;//cameraType.style.margin
         } else {
             e.style.fontWeight = 'bold';
-            e.style.backgroundColor = 'rgba(255,255,255,0.2)';
+            e.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
         }
     });
     let y = typesWidth[1] - typesWidth[0];
@@ -365,10 +372,15 @@ function selectType(x = 0) {
             document.querySelector("#container > div:nth-child(3) > div:nth-child(2)").style.display = 'flex';
             document.getElementById('shutter').onclick = () => {
                 if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                    let saveImage = document.createElement('canvas');
+                    saveImage.width = video.videoWidth;
+                    saveImage.height = video.videoHeight;
+                    let saveContext = saveImage.getContext('2d');
+                    saveContext.drawImage(video, 0, 0, saveImage.width, saveImage.height);
                     let img = new Image();
-                    img.src = canvasElement.toDataURL('image/png');
+                    img.src = saveImage.toDataURL('image/png');
                     gallery.unshift(img);
-                    document.getElementById('gallery').style.backgroundImage = `url(${img.src})`;
+                    document.querySelectorAll('#gallery')[1].style.backgroundImage = `url(${img.src})`;
                 }
             };
             break;
@@ -418,12 +430,12 @@ function calculateSharpness(pixels, width, height) {
             const indexBottom = ((y + 1) * width + x) * 4;
 
             const deltaX = Math.abs(pixels[index] - pixels[indexRight]) +
-                           Math.abs(pixels[index + 1] - pixels[indexRight + 1]) +
-                           Math.abs(pixels[index + 2] - pixels[indexRight + 2]);
+                Math.abs(pixels[index + 1] - pixels[indexRight + 1]) +
+                Math.abs(pixels[index + 2] - pixels[indexRight + 2]);
 
             const deltaY = Math.abs(pixels[index] - pixels[indexBottom]) +
-                           Math.abs(pixels[index + 1] - pixels[indexBottom + 1]) +
-                           Math.abs(pixels[index + 2] - pixels[indexBottom + 2]);
+                Math.abs(pixels[index + 1] - pixels[indexBottom + 1]) +
+                Math.abs(pixels[index + 2] - pixels[indexBottom + 2]);
 
             sum += deltaX + deltaY;
         }
