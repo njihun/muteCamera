@@ -32,6 +32,7 @@ function openCamera() {
     div.style.height = '58vh';//calc(88vh - 30vh)
     div.style.top = '12vh';
     div.id = 'more';
+    div.innerHTML = `<button onclick="fullscreen();">전체화면</button>`
 
     container.appendChild(div);
 
