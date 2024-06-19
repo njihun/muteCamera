@@ -1,16 +1,75 @@
 let video;
 let canvasElement;
+let canvas;
 let container = document.querySelector('#container');
 let innerSize = [innerWidth, innerHeight];
 let facingMode = 'user';
 let gallery = [];
+let test = 0;
+let model;
+
+// Function to detect objects in video stream
+async function detectObjects(model) {
+    if (!model) {
+        console.error("Model is not loaded yet!");
+        return;
+    }
+    const predictions = await model.detect(video);
+
+    
+    innerSize = [innerWidth, innerHeight];
+    let height = Number(document.getElementById('more').style.height.replace('vh', ''));
+    canvasElement.width = video.videoWidth / video.videoHeight * (height / 100 * innerSize[1]);
+    canvasElement.height = video.videoHeight / video.videoWidth * innerSize[0];
+    if (video.videoWidth > video.videoHeight) {
+        if (canvasElement.height > height / 100 * innerSize[1]) {
+            canvasElement.width = innerSize[0];
+        } else {
+            canvasElement.height = height / 100 * innerSize[1];
+        }
+    } else {
+        if (canvasElement.width > innerSize[0]) {
+            canvasElement.height = height / 100 * innerSize[1];
+        } else {
+            canvasElement.width = innerSize[0];
+        }
+    }
+    canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+
+    // Draw the predictions
+    predictions.forEach(prediction => {
+        canvas.beginPath();
+        canvas.rect(...prediction.bbox);
+        canvas.lineWidth = 2;
+        canvas.strokeStyle = 'green';
+        canvas.fillStyle = 'green';
+        canvas.stroke();
+        canvas.fillText(
+            `${prediction.class} (${(prediction.score * 100).toFixed(2)}%)`,
+            prediction.bbox[0],
+            prediction.bbox[1] > 10 ? prediction.bbox[1] - 5 : 10
+        );
+    });
+}
+
+// Load the model and start detection
+function init() {
+    test = 1;
+}
+async function testFunc(){
+    model = await cocoSsd.load();
+}
+
 document.addEventListener('fullscreenchange', () => {
     innerSize = [innerWidth, innerHeight];
-    setTimeout(()=>{selectType(Array.from(document.getElementById('types').children).map((e) => {
-        return e.style.backgroundColor;
-    }).indexOf('rgba(255, 255, 255, 0.2)'))}, 100);
+    setTimeout(() => {
+        selectType(Array.from(document.getElementById('types').children).map((e) => {
+            return e.style.backgroundColor;
+        }).indexOf('rgba(255, 255, 255, 0.2)'))
+    }, 100);
 });
 function openCamera() {
+    testFunc();
     // if (!isFullscreen) {
     //     alert("전체 화면이 지원되지 않는 환경입니다. 브라우저에 따라 화면 비율이 다르게 표시될 수 있습니다.");
     // }
@@ -36,6 +95,7 @@ function openCamera() {
     div.style.top = '12vh';
     div.id = 'more';
     div.innerHTML = `<button onclick="fullscreen();">전체화면</button>`
+    div.innerHTML = `<button onclick="init();">사물인식</button>`
 
     container.appendChild(div);
 
@@ -226,8 +286,6 @@ function openCamera() {
 
                     const sharpness = calculateSharpness(pixels, canvas.width, canvas.height);
                     const noise = calculateNoise(pixels);
-                    console.log(`Sharpness: ${sharpness.toFixed(2)}`);
-                    console.log(`Noise Level: ${noise.toFixed(2)}`);
                     document.querySelectorAll('#detailValue span')[0].textContent = `${canvas.width} x ${canvas.height}`;
                     document.querySelectorAll('#detailValue span')[1].textContent = sharpness.toFixed(2);
                     document.querySelectorAll('#detailValue span')[2].textContent = noise.toFixed(2);
@@ -309,7 +367,9 @@ function openCamera() {
                 video.srcObject = stream;
                 video.setAttribute('playsinline', true);      // iOS 사용시 전체 화면을 사용하지 않음을 전달
                 video.play();
-                requestAnimationFrame(tick);
+                video.onloadeddata = () => {
+                    requestAnimationFrame(tick);
+                }
             });
         } catch (err) {
             console.error("Error accessing the camera: ", err);
@@ -317,26 +377,31 @@ function openCamera() {
     }
     function tick() {
         if (video.readyState === video.HAVE_ENOUGH_DATA) {
-            innerSize = [innerWidth, innerHeight];
-            let height = Number(document.getElementById('more').style.height.replace('vh', ''));
-            canvasElement.width = video.videoWidth / video.videoHeight * (height / 100 * innerSize[1]);
-            canvasElement.height = video.videoHeight / video.videoWidth * innerSize[0];
-            if (video.videoWidth > video.videoHeight) {
-                if (canvasElement.height > height / 100 * innerSize[1]) {
-                    canvasElement.width = innerSize[0];
+            if(test==0){
+                innerSize = [innerWidth, innerHeight];
+                let height = Number(document.getElementById('more').style.height.replace('vh', ''));
+                canvasElement.width = video.videoWidth / video.videoHeight * (height / 100 * innerSize[1]);
+                canvasElement.height = video.videoHeight / video.videoWidth * innerSize[0];
+                if (video.videoWidth > video.videoHeight) {
+                    if (canvasElement.height > height / 100 * innerSize[1]) {
+                        canvasElement.width = innerSize[0];
+                    } else {
+                        canvasElement.height = height / 100 * innerSize[1];
+                    }
                 } else {
-                    canvasElement.height = height / 100 * innerSize[1];
+                    if (canvasElement.width > innerSize[0]) {
+                        canvasElement.height = height / 100 * innerSize[1];
+                    } else {
+                        canvasElement.width = innerSize[0];
+                    }
                 }
-            } else {
-                if (canvasElement.width > innerSize[0]) {
-                    canvasElement.height = height / 100 * innerSize[1];
-                } else {
-                    canvasElement.width = innerSize[0];
-                }
+                canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+            }else{
+                detectObjects(model);
             }
-            canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+            requestAnimationFrame(tick);
+
         }
-        requestAnimationFrame(tick);
     }
 }
 function selectType(x = 0) {
