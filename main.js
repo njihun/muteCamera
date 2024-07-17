@@ -11,15 +11,24 @@ let model;
 async function getData() {
     const url = "https://1bf85d71-a0ed-40a4-9cfa-c6b85d0e65ba-00-2o9itfec20p16.riker.replit.dev:3000/detectBottle";
     try {
-        const response = await fetch(url);
+        console.log(`Sending GET request to: ${url}`);
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        console.log(`Response status: ${response.status}`);
+        
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }
-        
-        const json = await response.json();
-        console.log(json);
+
+        const text = await response.text(); // 서버 응답이 JSON이 아닌 문자열이므로 text()로 받습니다
+        console.log('Response text:', text);
     } catch (error) {
-        console.error(error.message);
+        console.error('Fetch error:', error.message);
     }
 }
 function servoMotor(detectedObj) {
