@@ -8,24 +8,24 @@ let gallery = [];
 let test = 0;
 let model;
 !detectObjectsButton();
+async function getData() {
+    const url = "https://1bf85d71-a0ed-40a4-9cfa-c6b85d0e65ba-00-2o9itfec20p16.riker.replit.dev:3000/detectBottle";
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+        
+        const json = await response.json();
+        console.log(json);
+    } catch (error) {
+        console.error(error.message);
+    }
+}
 function servoMotor(detectedObj) {
     console.log(detectedObj);
     if(detectedObj.includes('bottle')){
-        async function getData() {
-            const url = "https://1bf85d71-a0ed-40a4-9cfa-c6b85d0e65ba-00-2o9itfec20p16.riker.replit.dev:3000/detectBottle";
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`Response status: ${response.status}`);
-                }
-                
-                const json = await response.json();
-                console.log(json);
-            } catch (error) {
-                console.error(error.message);
-            }
-        }
-        console.log('!!!!!');
+        getData();
     }
 }
 // Function to detect objects in video stream
